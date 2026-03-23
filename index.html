@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Global Puzzle Challenge</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Segoe UI;
+background:linear-gradient(135deg,#1e3c72,#2a5298);
+color:white;
+text-align:center;
+}
+
+header{
+font-size:38px;
+padding:25px;
+font-weight:bold;
+}
+
+.card{
+background:white;
+color:#333;
+width:650px;
+margin:auto;
+margin-top:30px;
+padding:35px;
+border-radius:15px;
+box-shadow:0 15px 40px rgba(0,0,0,0.5);
+}
+
+input{
+width:70%;
+padding:12px;
+font-size:16px;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
+button{
+padding:12px 20px;
+margin:8px;
+border:none;
+border-radius:8px;
+font-size:15px;
+cursor:pointer;
+background:#2a5298;
+color:white;
+}
+
+button:hover{
+background:#1e3c72;
+}
+
+.stats{
+margin-top:15px;
+font-size:18px;
+}
+
+.level{
+font-size:22px;
+color:#2a5298;
+}
+
+footer{
+margin-top:50px;
+opacity:0.7;
+}
+
+.leaderboard{
+margin-top:20px;
+text-align:left;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>Global Puzzle Challenge</header>
+
+<div class="card">
+
+<h2 id="puzzle">Press Start</h2>
+
+<input id="answer" placeholder="Type your answer">
+
+<br>
+
+<button onclick="check()">Submit</button>
+<button onclick="newPuzzle()">Next</button>
+<button onclick="toggleLang()">🌍 Translate</button>
+<button onclick="resetGame()">Reset</button>
+
+<div class="stats">
+<p>Score: <span id="score">0</span></p>
+<p class="level">Level: <span id="level">1</span></p>
+</div>
+
+<p id="result"></p>
+
+<div class="leaderboard">
+<h3>Leaderboard</h3>
+<ul id="board"></ul>
+</div>
+
+</div>
+
+<footer>
+Directed by Sara Hamdi
+</footer>
+
+<script>
+
+// ====== SETTINGS ======
+let language="en"
+let score=localStorage.getItem("score")||0
+let level=localStorage.getItem("level")||1
+
+// ====== NORMALIZE ======
+function normalize(text){
+return text.toLowerCase().trim()
+.replace(/[^\w\s\u0600-\u06FF]/g,"")
+}
+
+// ====== PUZZLES ======
+const puzzles=[
+
+{
+en:"I speak without a mouth and hear without ears. What am I?",
+ar:"أتكلم بلا فم وأسمع بلا أذن. ما أنا؟",
+answers:["echo","sound reflection","صدى"]
+},
+
+{
+en:"What gets bigger the more you take away?",
+ar:"ما الشيء الذي يكبر كلما أخذت منه؟",
+answers:["hole","pit","حفرة"]
+},
+
+{
+en:"What has keys but cannot open locks?",
+ar:"ما الشيء الذي له مفاتيح ولا يفتح الأقفال؟",
+answers:["piano","keyboard","بيانو"]
+},
+
+{
+en:"What has many teeth but cannot bite?",
+ar:"له أسنان لكنه لا يعض",
+answers:["comb","مشط"]
+},
+
+{
+en:"What can travel around the world while staying in one corner?",
+ar:"يسافر حول العالم ويبقى في مكانه",
+answers:["stamp","طابع"]
+},
+
+{
+en:"What gets wetter the more it dries?",
+ar:"ما الذي يزداد بللاً كلما جفف؟",
+answers:["towel","منشفة"]
+}
+
+]
+
+// ====== AI GENERATOR ======
+function generatePuzzle(){
+
+let words=[
+{en:"time",ar:"الوقت"},
+{en:"shadow",ar:"الظل"},
+{en:"wind",ar:"الرياح"},
+{en:"light",ar:"الضوء"}
+]
+
+let w=words[Math.floor(Math.random()*words.length)]
+
+return {
+en:"I am everywhere. You cannot touch me. I can be fast or slow. What am I?",
+ar:"أنا موجود في كل مكان، لا يمكن لمسي، أكون سريع أو بطيء. ما أنا؟",
+answers:[w.en,w.ar]
+}
+
+}
+
+// ====== GAME ======
+let current
+
+function newPuzzle(){
+
+if(Math.random()<0.5){
+current=puzzles[Math.floor(Math.random()*puzzles.length)]
+}else{
+current=generatePuzzle()
+}
+
+document.getElementById("puzzle").innerText=
+(language=="en")?current.en:current.ar
+
+document.getElementById("answer").value=""
+document.getElementById("result").innerText=""
+
+}
+
+function check(){
+
+let user=normalize(document.getElementById("answer").value)
+
+let correct=false
+
+for(let ans of current.answers){
+if(user.includes(normalize(ans))){
+correct=true
+break
+}
+}
+
+if(correct){
+
+score=parseInt(score)+10
+
+if(score%50==0) level++
+
+document.getElementById("result").innerText=
+(language=="en")?"Correct!":"إجابة صحيحة"
+
+saveScore()
+
+}else{
+
+document.getElementById("result").innerText=
+(language=="en")?"Wrong answer":"إجابة خاطئة"
+
+}
+
+updateUI()
+
+}
+
+// ====== SAVE ======
+function saveScore(){
+localStorage.setItem("score",score)
+localStorage.setItem("level",level)
+updateBoard()
+}
+
+// ====== UI ======
+function updateUI(){
+document.getElementById("score").innerText=score
+document.getElementById("level").innerText=level
+}
+
+// ====== LANGUAGE ======
+function toggleLang(){
+language=(language=="en")?"ar":"en"
+
+if(current){
+document.getElementById("puzzle").innerText=
+(language=="en")?current.en:current.ar
+}
+}
+
+// ====== RESET ======
+function resetGame(){
+score=0
+level=1
+saveScore()
+updateUI()
+}
+
+// ====== LEADERBOARD ======
+function updateBoard(){
+
+let board=JSON.parse(localStorage.getItem("board")||"[]")
+
+board.push(score)
+
+board.sort((a,b)=>b-a)
+board=board.slice(0,5)
+
+localStorage.setItem("board",JSON.stringify(board))
+
+let ul=document.getElementById("board")
+ul.innerHTML=""
+
+board.forEach(s=>{
+let li=document.createElement("li")
+li.innerText="Score: "+s
+ul.appendChild(li)
+})
+
+}
+
+// INIT
+updateUI()
+updateBoard()
+
+</script>
+
+</body>
+</html>
