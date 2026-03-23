@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Global Puzzle Challenge</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Segoe UI;
+background:linear-gradient(135deg,#1e3c72,#2a5298);
+color:white;
+text-align:center;
+}
+
+header{
+font-size:40px;
+padding:30px;
+font-weight:bold;
+letter-spacing:2px;
+}
+
+.card{
+
+background:white;
+color:#333;
+width:600px;
+margin:auto;
+margin-top:40px;
+padding:40px;
+border-radius:15px;
+box-shadow:0 20px 40px rgba(0,0,0,0.4);
+
+}
+
+input{
+
+width:70%;
+padding:12px;
+font-size:16px;
+border-radius:8px;
+border:1px solid #ccc;
+
+}
+
+button{
+
+padding:12px 20px;
+margin:10px;
+border:none;
+border-radius:8px;
+font-size:16px;
+cursor:pointer;
+background:#2a5298;
+color:white;
+
+}
+
+button:hover{
+background:#1e3c72;
+}
+
+.stats{
+
+margin-top:20px;
+font-size:18px;
+
+}
+
+footer{
+
+margin-top:60px;
+opacity:0.7;
+
+}
+
+.level{
+
+font-size:22px;
+color:#2a5298;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>Global Puzzle Challenge</header>
+
+<div class="card">
+
+<h2 id="puzzle">Press Start</h2>
+
+<input id="answer" placeholder="Type your answer">
+
+<br>
+
+<button onclick="check()">Submit</button>
+<button onclick="newPuzzle()">Next Puzzle</button>
+<button onclick="toggleLang()">Translate</button>
+
+<div class="stats">
+
+<p>Score: <span id="score">0</span></p>
+<p class="level">Level: <span id="level">1</span></p>
+
+</div>
+
+<p id="result"></p>
+
+</div>
+
+<footer>
+Directed by Sara Hamdi
+</footer>
+
+<script>
+
+let language="en"
+
+let score=0
+let level=1
+
+const puzzles=[
+
+{en:"I speak without a mouth and hear without ears. What am I?",ar:"أتكلم بلا فم وأسمع بلا أذن. ما أنا؟",a:"echo"},
+
+{en:"What gets bigger the more you take away?",ar:"ما الشيء الذي يكبر كلما أخذت منه؟",a:"hole"},
+
+{en:"What has keys but cannot open locks?",ar:"ما الشيء الذي له مفاتيح ولا يفتح الأقفال؟",a:"piano"},
+
+{en:"What has many teeth but cannot bite?",ar:"له أسنان لكنه لا يعض",a:"comb"},
+
+{en:"What can travel around the world while staying in one corner?",ar:"يسافر حول العالم ويبقى في مكانه",a:"stamp"},
+
+{en:"What gets wetter the more it dries?",ar:"ما الذي يزداد بللاً كلما جفف؟",a:"towel"}
+
+]
+
+function randomPuzzle(){
+
+let words=["time","shadow","river","fire","wind","light"]
+
+let w=words[Math.floor(Math.random()*words.length)]
+
+return {
+
+en:"I exist everywhere but you cannot hold me. Sometimes I move fast sometimes slow. What am I? ("+w+" related)",
+
+ar:"أنا موجود في كل مكان لكن لا يمكن الإمساك بي أحيانا سريع وأحيانا بطيء",
+
+a:w
+
+}
+
+}
+
+let current
+
+function newPuzzle(){
+
+if(Math.random()<0.6){
+
+current=puzzles[Math.floor(Math.random()*puzzles.length)]
+
+}else{
+
+current=randomPuzzle()
+
+}
+
+document.getElementById("puzzle").innerText=(language=="en")?current.en:current.ar
+
+document.getElementById("result").innerText=""
+
+document.getElementById("answer").value=""
+
+}
+
+function check(){
+
+let user=document.getElementById("answer").value.toLowerCase()
+
+if(user.includes(current.a)){
+
+score+=10
+
+if(score%50==0) level++
+
+document.getElementById("result").innerText=(language=="en")?"Correct!":"إجابة صحيحة"
+
+}else{
+
+document.getElementById("result").innerText=(language=="en")?"Wrong answer":"إجابة خاطئة"
+
+}
+
+document.getElementById("score").innerText=score
+document.getElementById("level").innerText=level
+
+}
+
+function toggleLang(){
+
+if(language=="en"){
+language="ar"
+}else{
+language="en"
+}
+
+if(current){
+document.getElementById("puzzle").innerText=(language=="en")?current.en:current.ar
+}
+
+}
+
+</script>
+
+</body>
+</html>
